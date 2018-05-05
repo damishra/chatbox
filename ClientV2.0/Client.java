@@ -9,6 +9,10 @@ import java.io.*;
 import java.util.*;
 //net
 import java.net.*;
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+import java.security.MessageDigest;
 
 public class Client extends JFrame implements ActionListener{
 
@@ -50,6 +54,7 @@ public class Client extends JFrame implements ActionListener{
    private int PORT_NUMBER = 42069;
    private PrintWriter out = null;
    private Scanner in = null;
+   private EncryptDecrypt ed = new EncryptDecrypt();
 
    public static void main(String args[]){
       new Client();
@@ -210,7 +215,11 @@ public class Client extends JFrame implements ActionListener{
             System.out.println(fileName+"");
             bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileName)));
             for(int j = 0; j<fileLines; j++){
-               bw.write(doInString());
+               String message = doInString();
+               System.out.println(message);
+               byte[] ggwp = ed.hexStringToByteArray(message);
+               String finalMessage = ed.decryptText(ggwp, ed.getSecretEncryptionKey());
+               bw.write(finalMessage);
                bw.newLine();
                bw.flush();
             }

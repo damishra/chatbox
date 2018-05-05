@@ -3,10 +3,16 @@ import java.io.*;
 import java.net.Socket;
 import java.util.*;
 import java.nio.file.*;
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+import java.security.MessageDigest;
 
 public class ClientThread extends Thread {
    private Socket clientSocket;
    private JTextArea log;
+   
+   private EncryptDecrypt ed = new EncryptDecrypt();
 
    private static String OK = "250";
    private static String DATA = "354";
@@ -105,6 +111,7 @@ public class ClientThread extends Thread {
    
    public void doFetch(){
       doReply(OK);
+      String message = "";
       try{
          Scanner scn = null;    
          File[] emails = new File("accounts/"+user+"/inbox/").listFiles();
@@ -116,7 +123,11 @@ public class ClientThread extends Thread {
             doReply(file.getName());
             scn = new Scanner(new InputStreamReader(new FileInputStream(file)));
             while(scn.hasNextLine()){
-               doReply(scn.nextLine());
+               message = scn.nextLine();
+               SecretKey secKey = ed.getSecretEncryptionKey();
+               byte[] cipherText = ed.encryptText(message, secKey);
+               String hexText = ed.bytesToHex(cipherText);
+               doReply(hexText);
             }
             scn.close();
          }
