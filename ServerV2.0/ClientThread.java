@@ -91,7 +91,10 @@ public class ClientThread extends Thread {
                   }
                }
                if ((str.equals("DATA"))&&(user.equals("SERVER"))) {
-                  data = in.nextLine();
+                  while (in.hasNextLine()){
+                     data = in.nextLine();
+                     log.append(data);
+                  }
                }
             
                if (str.equals("QUIT")) {

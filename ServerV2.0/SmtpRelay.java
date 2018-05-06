@@ -37,8 +37,9 @@ public class SmtpRelay {
             log.append(clientID + br.readLine() +"\n");
             smtp("FROM " + fromEmailAddress);
             smtp("TO " + toEmailAddress);
-            smtp("DATA "+ data);
-            log.append(clientID + " Relay set to: " + "test" +"\n");
+            smtp("DATA");
+            smtp(data);
+            //log.append(clientID + " Relay set to: " + "test" +"\n");
          }catch(Exception e){}
       }
       if(!sending){
