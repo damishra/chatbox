@@ -26,20 +26,19 @@ public class SmtpRelay {
     
    SmtpRelay(boolean sending, String toEmailAddress, String fromEmailAddress, String data, JTextArea log, String _relay) throws Exception {
       this.log = log;
-      socket = new Socket("129.21.129.220" ,42069);
+      socket = new Socket(_relay ,42069);
       br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
       out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
       String clientID = ("<"+this.socket.getInetAddress().getHostAddress() + ":" + this.socket.getPort()+">");
       log.append("Connection Established w/Client: " + clientID + "\n");
       if(sending){
          try{
-            smtp("SERVER");
+            smtp("relay");
             log.append(clientID + br.readLine() +"\n");
             smtp("FROM " + fromEmailAddress);
             smtp("TO " + toEmailAddress);
             smtp("DATA");
             smtp(data);
-            //log.append(clientID + " Relay set to: " + "test" +"\n");
          }catch(Exception e){}
       }
       if(!sending){

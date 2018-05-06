@@ -32,6 +32,8 @@ public class ClientThread extends Thread {
    private String data = "";
    private String relay = "";
 
+   private String toAddress = "";
+
    private int ccon;
 
    ClientThread(Socket clientSocket, JTextArea log, int ccon) {
@@ -72,10 +74,12 @@ public class ClientThread extends Thread {
                }
                if (str.substring(0, 2).equals("TO")) {
                   to = str.substring(3);
+                  toAddress = to.substring(to.lastIndexOf("@") + 1);
+                  System.out.println(toAddress);
                   doReply(OK);
                   log.append(clientID + " Sender set to: " + to+"\n");
                }
-               if ((str.equals("DATA"))&&(!user.equals("SERVER"))) {
+               if ((str.equals("DATA"))&&(!user.equals("relay"))) {
                   doReply(DATA);
                   String line = "";
                   data = "";
@@ -90,7 +94,7 @@ public class ClientThread extends Thread {
                      }
                   }
                }
-               if ((str.equals("DATA"))&&(user.equals("SERVER"))) {
+               if ((str.equals("DATA"))&&(user.equals("relay"))) {
                   while (in.hasNextLine()){
                      data = in.nextLine();
                      log.append(data+"\n");
@@ -155,7 +159,7 @@ public class ClientThread extends Thread {
    
    public void doSend(){
       try{
-         smtp = new SmtpRelay(true, to, from, data, log, relay);
+         smtp = new SmtpRelay(true, to, from, data, log, toAddress);
       }catch(Exception e){}
    }
 
