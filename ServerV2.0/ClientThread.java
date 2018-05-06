@@ -177,7 +177,7 @@ public class ClientThread extends Thread {
       String userSave = to.substring(0,(to.indexOf("@")-1));
       String fileName = "accounts/"+userSave+"/inbox/"+ldt+"_"+from+".txt";
       bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(fileName))));
-      bw.write(fullMessage);
+      bw.write(fullMessage+"\n");
       bw.flush();
       bw.close();
    } 
