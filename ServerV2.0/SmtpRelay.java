@@ -24,9 +24,9 @@ public class SmtpRelay {
 	private String user = "";
     private String pass = "";
     
-    SmtpRelay(String toEmailAddress, String fromEmailAddress, String data, JTextArea log) throws Exception {
+    SmtpRelay(String toEmailAddress, String fromEmailAddress, String data, JTextArea log, String relay) throws Exception {
 		this.log = log;
-       socket = new Socket("your.smtp.server",42069);
+       socket = new Socket(relay ,42069);
        br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
        os = socket.getOutputStream();
        try {

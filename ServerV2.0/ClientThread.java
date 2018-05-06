@@ -75,7 +75,8 @@ public class ClientThread extends Thread {
                      if (!line.equals(".")){
                         data += line + "\n";
                      }else{                  
-                        doReply("250: Queued as: null");
+                        doReply("250: Queued as: 1");
+                        doSend();
                         break;
                      }
                   }
@@ -134,6 +135,10 @@ public class ClientThread extends Thread {
          scn.close();
       }catch(Exception e){
       }
+   }
+   
+   public void doSend(){
+      SmtpRelay(to, from, data, log, relay);
    }
 
    
