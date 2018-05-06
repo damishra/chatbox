@@ -14,6 +14,8 @@ public class ClientThread extends Thread {
    
    private EncryptDecrypt ed = new EncryptDecrypt();
 
+   private SmtpRelay smtp = null;
+
    private static String OK = "250";
    private static String DATA = "354";
    private static String PASS = "220";
@@ -24,6 +26,11 @@ public class ClientThread extends Thread {
    
    private String user = "";
    private String pass = "";
+
+   private String to = "";
+   private String from = "";
+   private String data = "";
+   private String relay = "";
 
    private int ccon;
 
@@ -52,24 +59,24 @@ public class ClientThread extends Thread {
                String str = in.nextLine();
                System.out.println(str);
                if (str.substring(0, 4).equals("HELO")) {
-                  String relay = str.substring(5);
+                  relay = str.substring(5);
                   doReply(OK);
                   log.append(clientID + " Relay set to: " + relay+"\n");
                }
                if (str.substring(0, 4).equals("FROM")) {
-                  String from = str.substring(5);
+                  from = str.substring(5);
                   doReply(OK);
                   log.append(clientID + " Rcpt set to: " + from+"\n");
                }
                if (str.substring(0, 2).equals("TO")) {
-                  String to = str.substring(3);
+                  to = str.substring(3);
                   doReply(OK);
                   log.append(clientID + " Sender set to: " + to+"\n");
                }
                if (str.equals("DATA")) {
                   doReply(DATA);
                   String line = "";
-                  String data = "";
+                  data = "";
                   while (true) {
                      line = in.nextLine();
                      if (!line.equals(".")){
@@ -138,7 +145,9 @@ public class ClientThread extends Thread {
    }
    
    public void doSend(){
-      SmtpRelay(to, from, data, log, relay);
+      try{
+         smtp = new SmtpRelay(to, from, data, log, relay);
+         }catch(Exception e){}
    }
 
    
