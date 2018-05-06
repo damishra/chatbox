@@ -70,14 +70,14 @@ public class ClientThread extends Thread {
                if (str.substring(0, 4).equals("FROM")) {
                   from = str.substring(5);
                   doReply(OK);
-                  log.append(clientID + " Rcpt set to: " + from+"\n");
+                  log.append(clientID + " Sender set to: " + from +"\n");
                }
                if (str.substring(0, 2).equals("TO")) {
                   to = str.substring(3);
-                  toAddress = to.substring(to.lastIndexOf("@") + 1);
-                  System.out.println(toAddress);
+                  toAddress = to.substring(to.lastIndexOf("@")+1);
+                  System.out.println("ADDRESS: "+toAddress);
                   doReply(OK);
-                  log.append(clientID + " Sender set to: " + to+"\n");
+                  log.append(clientID + " Rcpt set to: " + to+"\n");
                }
                if ((str.equals("DATA"))&&(!user.equals("relay"))) {
                   doReply(DATA);

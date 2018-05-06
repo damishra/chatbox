@@ -203,7 +203,7 @@ public class Client extends JFrame implements ActionListener{
    }
    
    public void doSend(){
-      Message msg = new Message(jtfUsername.getText(),jtfRcpt.getText(),jtfSubj.getText(),jtaEmail.getText(),jtfServerIP.getText());
+      Message msg = new Message(jtfRcpt.getText(),jtfUsername.getText(),jtfSubj.getText(),jtaEmail.getText(),jtfServerIP.getText());
       if(msg.isValid()){
          msg.parseMessage();
          try{
