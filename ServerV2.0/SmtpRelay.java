@@ -10,7 +10,7 @@ import javax.swing.*;
 public class SmtpRelay {
    private Socket socket = null;
    private BufferedReader br = null;
-   private OutputStream os = null;
+   private PrintWriter out = null;
 	
    private static String OK = "250";
    private static String DATA = "354";
@@ -28,7 +28,7 @@ public class SmtpRelay {
       this.log = log;
       socket = new Socket("129.21.129.220" ,42069);
       br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-      os = socket.getOutputStream();
+      out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
       String clientID = ("<"+this.socket.getInetAddress().getHostAddress() + ":" + this.socket.getPort()+">");
       log.append("Connection Established w/Client: " + clientID + "\n");
       if(sending){
@@ -78,7 +78,7 @@ public class SmtpRelay {
                   if (str.equals("QUIT")) {
                      smtp(QUIT);
                      br.close();
-                     os.close();
+                     out.close();
                   }
                
                //retrieve will gather all emails for user and send it over to them
@@ -96,8 +96,8 @@ public class SmtpRelay {
    }
     
    void smtp(String command) throws Exception {
-      os.write(command.getBytes());
-      os.flush();
+      out.println(command);
+      out.flush();
    }
 	
    public void doFetch() throws Exception {

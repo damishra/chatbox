@@ -50,9 +50,11 @@ public class ClientThread extends Thread {
          user = in.nextLine();
          log.append(clientID + " Command: " + user + "\n");
          doReply(OK);
-         pass = in.nextLine();
-         log.append(clientID + " Command: " + pass + "\n");
-         doReply(PASS);
+         if(!user.equals("SERVER")){
+            pass = in.nextLine();
+            log.append(clientID + " Command: " + pass + "\n");
+            doReply(PASS);
+         }
          
          while(true) 
             try {
@@ -73,7 +75,7 @@ public class ClientThread extends Thread {
                   doReply(OK);
                   log.append(clientID + " Sender set to: " + to+"\n");
                }
-               if (str.equals("DATA")) {
+               if ((str.equals("DATA"))&&(!user.equals("SERVER"))) {
                   doReply(DATA);
                   String line = "";
                   data = "";
@@ -88,6 +90,10 @@ public class ClientThread extends Thread {
                      }
                   }
                }
+               if ((str.equals("DATA"))&&(user.equals("SERVER"))) {
+                  data = in.nextLine();
+               }
+            
                if (str.equals("QUIT")) {
                   doReply(QUIT);
                   out.close();
@@ -146,7 +152,7 @@ public class ClientThread extends Thread {
    
    public void doSend(){
       try{
-         smtp = new SmtpRelay(to, from, data, log, relay);
+         smtp = new SmtpRelay(true, to, from, data, log, relay);
       }catch(Exception e){}
    }
 
