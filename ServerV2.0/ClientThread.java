@@ -93,7 +93,7 @@ public class ClientThread extends Thread {
                if ((str.equals("DATA"))&&(user.equals("SERVER"))) {
                   while (in.hasNextLine()){
                      data = in.nextLine();
-                     log.append(data);
+                     log.append(data+"\n");
                   }
                }
             
