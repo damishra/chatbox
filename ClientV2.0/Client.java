@@ -248,9 +248,9 @@ public class Client extends JFrame implements ActionListener{
             for(int j = 0; j<fileLines; j++){
                String message = doInString();
                System.out.println(message);
-               byte[] ggwp = ed.hexStringToByteArray(message);
-               String finalMessage = ed.decryptText(ggwp, ed.getSecretEncryptionKey());
-               bw.write(finalMessage);
+               //byte[] ggwp = ed.hexStringToByteArray(message);
+               //String finalMessage = ed.decryptText(ggwp, ed.getSecretEncryptionKey());
+               bw.write(message);
                bw.newLine();
                bw.flush();
             }

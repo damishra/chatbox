@@ -39,6 +39,7 @@ public class SmtpRelay {
             smtp("TO " + toEmailAddress);
             smtp("DATA");
             smtp(data);
+            smtp(".");
          }catch(Exception e){}
       }
       if(!sending){

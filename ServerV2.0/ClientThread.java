@@ -101,7 +101,7 @@ public class ClientThread extends Thread {
                   }
                }
                if ((str.equals("DATA"))&&(user.equals("relay"))) {
-                  while (in.hasNextLine()){
+                  while (!data.equals(".")){
                      data = in.nextLine();
                      log.append(data+"\n");
                      fullMessage += (data+"\n");
@@ -143,7 +143,6 @@ public class ClientThread extends Thread {
    
    public void doFetch(){
       doReply(OK);
-      String message = "";
       try{
          Scanner scn = null;    
          File[] emails = new File("accounts/"+user+"/inbox/").listFiles();
@@ -155,8 +154,7 @@ public class ClientThread extends Thread {
             doReply(file.getName());
             scn = new Scanner(new InputStreamReader(new FileInputStream(file)));
             while(scn.hasNextLine()){
-               message = scn.nextLine();
-               doReply(message);
+               doReply(scn.nextLine());
             }
             scn.close();
          }
@@ -174,9 +172,14 @@ public class ClientThread extends Thread {
    }
    
    public void doSaveFile(String fullMessage)throws Exception{
-      String userSave = to.substring(0,(to.indexOf("@")-1));
-      String fileName = "accounts/"+userSave+"/inbox/"+ldt+"_"+from+".txt";
-      bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(fileName))));
+   
+      String userSave = to.substring(0,(to.indexOf("@")));
+      File fileSave = new File("accounts/"+userSave+"/inbox/"+"test"+".txt");
+      fileSave.getParentFile().mkdirs();
+   
+      // FileWriter writer = new FileWriter(fileSave);
+      
+      bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileSave)));
       bw.write(fullMessage);
       bw.newLine();
       bw.flush();
