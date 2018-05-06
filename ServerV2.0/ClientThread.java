@@ -175,8 +175,8 @@ public class ClientThread extends Thread {
    
    public void doSaveFile(String fullMessage)throws Exception{
       String userSave = to.substring(0,(to.indexOf("@")-1));
-      String fileName = "accounts/"+userSave+"/inbox/"+"<"+ldt+">"+from+".txt";
-      bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileName)));
+      String fileName = "accounts/"+userSave+"/inbox/"+ldt+"_"+from+".txt";
+      bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(fileName))));
       bw.write(fullMessage);
       bw.flush();
       bw.close();
