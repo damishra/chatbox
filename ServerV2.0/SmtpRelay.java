@@ -33,6 +33,8 @@ public class SmtpRelay {
       log.append("Connection Established w/Client: " + clientID + "\n");
       if(sending){
          try{
+            smtp("SERVER");
+            log.append(clientID + br.readLine() +"\n");
             smtp("FROM " + fromEmailAddress);
             smtp("TO " + toEmailAddress);
             smtp("DATA "+ data);

@@ -147,7 +147,7 @@ public class ClientThread extends Thread {
    public void doSend(){
       try{
          smtp = new SmtpRelay(to, from, data, log, relay);
-         }catch(Exception e){}
+      }catch(Exception e){}
    }
 
    
