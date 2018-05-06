@@ -11,6 +11,8 @@ class Message {
    private String message = "null1";
    private String ip = "null1";
    private LocalDateTime ldt = LocalDateTime.now();
+   
+   private EncryptDecrypt ed = new EncryptDecrypt();
 
    ArrayList<String> cc = new ArrayList<String>();
 
@@ -39,6 +41,8 @@ class Message {
    }
     
    String getMessage(){
+	   byte[] ba = ed.encryptText(message, ed.getSecretEncryptionKey());
+	   message = ed.bytesToHex(ba);
       return message;
    }
 

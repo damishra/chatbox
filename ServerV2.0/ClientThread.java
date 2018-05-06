@@ -7,12 +7,14 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.MessageDigest;
+import java.time.LocalDateTime;
 
 public class ClientThread extends Thread {
    private Socket clientSocket;
    private JTextArea log;
    
    private EncryptDecrypt ed = new EncryptDecrypt();
+   private LocalDateTime ldt = LocalDateTime.now();
 
    private SmtpRelay smtp = null;
 
@@ -23,6 +25,7 @@ public class ClientThread extends Thread {
 
    private PrintWriter out = null;
    private Scanner in = null;
+   private BufferedWriter bw = null;
    
    private String user = "";
    private String pass = "";
@@ -31,6 +34,8 @@ public class ClientThread extends Thread {
    private String from = "";
    private String data = "";
    private String relay = "";
+   
+   private String fullMessage = "";
 
    private String toAddress = "";
 
@@ -87,7 +92,8 @@ public class ClientThread extends Thread {
                      line = in.nextLine();
                      if (!line.equals(".")){
                         data += line + "\n";
-                     }else{                  
+                     }
+                     else{                  
                         doReply("250: Queued as: 1");
                         doSend();
                         break;
@@ -98,7 +104,9 @@ public class ClientThread extends Thread {
                   while (in.hasNextLine()){
                      data = in.nextLine();
                      log.append(data+"\n");
+                     fullMessage += (data+"\n");
                   }
+                  doSaveFile(fullMessage);
                }
             
                if (str.equals("QUIT")) {
@@ -113,17 +121,20 @@ public class ClientThread extends Thread {
                   doFetch();
                }
                
-            } catch (Exception e) {
+            } 
+            catch (Exception e) {
                break;
             }
-      } catch (Exception e) {
+      } 
+      catch (Exception e) {
          log.append("Exception (ClientThread): " + e + "\n");
       }
    }
    public void kill() {
       try{
          this.interrupt();
-      }catch(Exception e){}
+      }
+      catch(Exception e){}
    }
    public void doReply(String CODE){
       out.println(CODE);
@@ -145,23 +156,29 @@ public class ClientThread extends Thread {
             scn = new Scanner(new InputStreamReader(new FileInputStream(file)));
             while(scn.hasNextLine()){
                message = scn.nextLine();
-               SecretKey secKey = ed.getSecretEncryptionKey();
-               byte[] cipherText = ed.encryptText(message, secKey);
-               String hexText = ed.bytesToHex(cipherText);
-               doReply(hexText);
+               doReply(message);
             }
             scn.close();
          }
          scn.close();
-      }catch(Exception e){
+      }
+      catch(Exception e){
       }
    }
    
    public void doSend(){
       try{
          smtp = new SmtpRelay(true, to, from, data, log, toAddress);
-      }catch(Exception e){}
+      }
+      catch(Exception e){}
    }
-
    
+   public void doSaveFile(String fullMessage)throws Exception{
+      String userSave = to.substring(0,(to.indexOf("@")-1));
+      String fileName = "accounts/"+userSave+"/inbox/"+"<"+ldt+">"+from+".txt";
+      bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileName)));
+      bw.write(fullMessage);
+      bw.flush();
+      bw.close();
+   } 
 }
