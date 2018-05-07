@@ -15,17 +15,23 @@ import javax.crypto.spec.SecretKeySpec;
 import java.security.MessageDigest;
 
 public class Client extends JFrame implements ActionListener{
-   
+      //port number
    private static final int PORT_NUMBER = 42069;
-
+      //port number end
+   
+      //connections
    private Socket socket = null;
    private PrintWriter out = null;
    private Scanner in = null;
    private EncryptDecrypt ed = new EncryptDecrypt();
+      //end connections
       
+      //pop up frames
    private JFrame login = new JFrame();
    private JFrame viewEmails = new JFrame();
+      //end pop up frames
 
+      //main frame elements
    private JPanel jpNorthContainer = new JPanel();
    private JPanel jpNorthTop = new JPanel();
    private JPanel jpNorthBot = new JPanel();
@@ -33,6 +39,7 @@ public class Client extends JFrame implements ActionListener{
    private JPanel jpSouth = new JPanel();
    private JPanel jpWest = new JPanel();
    private JPanel jpCenter = new JPanel();
+      //end main frame elements
    
       //menu bar   
    private JMenuBar jmb = new JMenuBar();
@@ -82,9 +89,22 @@ public class Client extends JFrame implements ActionListener{
    private JScrollPane jspViewer = new JScrollPane(jtaViewer);
       //end email viewer popup
    
+   
+   
+   /*
+      Main method for client
+      
+      Main method will create the Client JFrame constructor
+   */
    public static void main(String[] args) {
       new Client();
    }
+   
+   
+   
+   /*
+      Client is the constructor for the GUI.
+   */
    private Client(){
       //Font font = new FontHandler().setFont1();
    
@@ -140,6 +160,11 @@ public class Client extends JFrame implements ActionListener{
       
    } 
    
+   
+   /*
+      login is the constuctor for the login popup JFrame gui
+      @params parent
+   */
    private void login(JFrame jf){
       
       login.setLocationRelativeTo(null);
@@ -163,6 +188,10 @@ public class Client extends JFrame implements ActionListener{
       login.setVisible(false);
    }
    
+   /*
+      viewEmails is the constuctor for the email txt viewer popup JFrame gui
+      @params parent
+   */   
    private void viewEmails(JFrame jf){
    
       viewEmails.setLocationRelativeTo(null);
@@ -174,6 +203,10 @@ public class Client extends JFrame implements ActionListener{
       
    }
    
+   /*
+      actionPerformed method is used to accept input from buttons and menu items
+      @params ActionEvent
+   */
    public void actionPerformed(ActionEvent ae){
    
       switch(ae.getActionCommand()){
@@ -203,10 +236,21 @@ public class Client extends JFrame implements ActionListener{
       }
    }
    
+   
+   /*
+      doConnect void method makes the login GUI visible
+   */
    public void doConnect(){
       login.setVisible(true);
    }
    
+   
+   /*
+      doLogin void method established connection to the server
+         it passes username, password, HELO over the socket
+         socket is established using the IP address provided in the
+         login popup
+   */
    public void doLogin(){
       try{
          socket = new Socket(jtfServerIP.getText(),PORT_NUMBER);
@@ -226,6 +270,12 @@ public class Client extends JFrame implements ActionListener{
       }
    }
    
+   
+   /*
+      doSend void method gathers the information and creates a Message object
+         the message is sent out using commands plus the information
+         the client recieves server responses after each command + data sent out
+   */
    public void doSend(){
       Message msg = new Message(jtfRcpt.getText(),jtfUsername.getText(),jtfSubj.getText(),jtaEmail.getText(),jtfServerIP.getText());
       if(msg.isValid()){
@@ -248,10 +298,22 @@ public class Client extends JFrame implements ActionListener{
       }
    }
    
+   
+   /*
+      doQuit void method is used to quit the client program
+   */
    public void doQuit(){
       doOutIn("QUIT");
    }  
    
+   
+   /*
+      doFetch void method is used to retrieve emails from the server
+         the fetch will grab any txt file that is stored on the signed in users
+         inbox directory. The fetched email is then placed into the inbox of
+         the currect client. This inbox is shared ammongst anyone who is signed into
+         this client running on this computer.
+   */
    public void doFetch(){
       String fileName = "";
       String serverFTP = "";
@@ -275,11 +337,21 @@ public class Client extends JFrame implements ActionListener{
                bw.newLine();
                bw.flush();
             }
-            bw.close();
+            try{
+               bw.close();
+               //in.close();
+               //in = new Scanner(new InputStreamReader(socket.getInputStream()));
+            }catch (Exception e){}
          }
       }catch(Exception e){}
    }
    
+   
+   /*
+      doOpenEmails void method is used to open the emails once they are fetched and put into the client inbox
+         the emails are partially encrypted. This means the client must decrypt them here. A JFileChooser is created
+         to allow the user to 
+   */
    public void doOpenEmails(){
       try{
          jtaViewer.setText("");
