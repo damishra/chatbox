@@ -322,7 +322,7 @@ public class Client extends JFrame implements ActionListener{
       BufferedWriter bw = null;
    
       try{
-         doOutIn("FETCH");
+         doOut("FETCH");
          numberOfFiles = Integer.parseInt(doInString());
          System.out.println(numberOfFiles+"");
          for(int i = 0; i<numberOfFiles; i++){

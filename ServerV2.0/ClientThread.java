@@ -143,7 +143,7 @@ public class ClientThread extends Thread {
    }
    
    public void doFetch(){
-      doReply(OK);
+      //doReply(OK);
       try{
          Scanner scn = null;    
          File[] emails = new File("accounts/"+user+"/inbox/").listFiles();
