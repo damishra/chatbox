@@ -22,8 +22,9 @@ public class Client extends JFrame implements ActionListener{
    private PrintWriter out = null;
    private Scanner in = null;
    private EncryptDecrypt ed = new EncryptDecrypt();
-   
+      
    private JFrame login = new JFrame();
+   private JFrame viewEmails = new JFrame();
 
    private JPanel jpNorthContainer = new JPanel();
    private JPanel jpNorthTop = new JPanel();
@@ -45,6 +46,7 @@ public class Client extends JFrame implements ActionListener{
    private JMenuItem jmiLine1 = new JMenuItem("------------------------------");
    private JMenuItem jmiSend = new JMenuItem("Send Email");
    private JMenuItem jmiFetch = new JMenuItem("Fetch Emails");
+   private JMenuItem jmiRead = new JMenuItem("Open Emails");
    private JMenuItem jmiLine2 = new JMenuItem("------------------------------");
    private JMenuItem jmiQuit = new JMenuItem("Quit Client");
       //end menu bar
@@ -74,6 +76,11 @@ public class Client extends JFrame implements ActionListener{
    private JTextField jtfPassword = new JTextField(15);
    private JButton jbLogin = new JButton("Login");
       //end login popup
+      
+      //email viewer popup
+   private JTextArea jtaViewer = new JTextArea(50,50);
+   private JScrollPane jspViewer = new JScrollPane(jtaViewer);
+      //end email viewer popup
    
    public static void main(String[] args) {
       new Client();
@@ -94,6 +101,7 @@ public class Client extends JFrame implements ActionListener{
       jmiLine1.setEnabled(false);
       jmEmail.add(jmiSend);
       jmEmail.add(jmiFetch);
+      jmEmail.add(jmiRead);
       jmEmail.add(jmiLine2);
       jmiLine2.setEnabled(false);
       jmEmail.add(jmiQuit);
@@ -114,9 +122,10 @@ public class Client extends JFrame implements ActionListener{
       jpNorthTop.add(jtfRcpt);
       jpNorthBot.add(jlSubj);
       jpNorthBot.add(jtfSubj);
-
+   
       login(this);
-
+      viewEmails(this);
+   
       this.pack();
       this.setVisible(true);
       
@@ -127,6 +136,7 @@ public class Client extends JFrame implements ActionListener{
       jmiAbout.addActionListener(this);
       jmiQuit.addActionListener(this);
       jmiDisconnect.addActionListener(this);
+      jmiRead.addActionListener(this);
       
    } 
    
@@ -134,7 +144,6 @@ public class Client extends JFrame implements ActionListener{
       
       login.setLocationRelativeTo(null);
       login.setTitle("Login");
-      login.setDefaultCloseOperation(EXIT_ON_CLOSE);
       login.setSize(100,100);
       
       login.add(jpLogin,BorderLayout.CENTER);
@@ -152,6 +161,17 @@ public class Client extends JFrame implements ActionListener{
       
       login.pack();
       login.setVisible(false);
+   }
+   
+   private void viewEmails(JFrame jf){
+   
+      viewEmails.setLocationRelativeTo(null);
+      viewEmails.setTitle("Viewer");
+      viewEmails.setSize(100,100);
+      viewEmails.add(jspViewer,BorderLayout.CENTER);
+      viewEmails.pack();
+      viewEmails.setVisible(false);
+      
    }
    
    public void actionPerformed(ActionEvent ae){
@@ -175,6 +195,10 @@ public class Client extends JFrame implements ActionListener{
       
          case "Fetch Emails":
             doFetch();
+            break;
+            
+         case "Open Emails":
+            doOpenEmails();
             break;
       }
    }
@@ -243,13 +267,10 @@ public class Client extends JFrame implements ActionListener{
             fileLines = Integer.parseInt(doInString());
             System.out.println(fileLines+"");
             fileName = doInString();
-            System.out.println(fileName+"");
-            bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileName)));
+            bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("inbox/"+fileName)));
             for(int j = 0; j<fileLines; j++){
                String message = doInString();
                System.out.println(message);
-               //byte[] ggwp = ed.hexStringToByteArray(message);
-               //String finalMessage = ed.decryptText(ggwp, ed.getSecretEncryptionKey());
                bw.write(message);
                bw.newLine();
                bw.flush();
@@ -257,6 +278,36 @@ public class Client extends JFrame implements ActionListener{
             bw.close();
          }
       }catch(Exception e){}
+   }
+   
+   public void doOpenEmails(){
+      try{
+         jtaViewer.setText("");
+         Scanner scnViewer = null;
+         String viewerLine = "";
+         JFileChooser fileChooser = new JFileChooser();
+         fileChooser.setCurrentDirectory(new File("inbox"));
+         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+         int result = fileChooser.showOpenDialog(this);
+         if (result == JFileChooser.APPROVE_OPTION) {
+            viewEmails.setVisible(true);
+            File selectedFile = fileChooser.getSelectedFile();
+            System.out.println("Selected file: " + selectedFile.getAbsolutePath());
+            scnViewer = new Scanner(selectedFile);
+         }
+         while(!viewerLine.equals(".")){
+            for(int i = 1; i <= 4; i++){
+               viewerLine = scnViewer.nextLine()+"\n";
+               jtaViewer.append(viewerLine);
+            }
+            viewerLine = scnViewer.nextLine();
+            byte[] messageBytes = ed.hexStringToByteArray(viewerLine);
+            String unencryptedViewer = ed.decryptText(messageBytes, ed.getSecretEncryptionKey());
+            jtaViewer.append(unencryptedViewer);
+         }
+         scnViewer.close();
+      }catch(Exception e){
+      }      
    }
    
    public String doInString(){
