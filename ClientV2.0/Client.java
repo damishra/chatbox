@@ -233,6 +233,14 @@ public class Client extends JFrame implements ActionListener{
          case "Open Emails":
             doOpenEmails();
             break;
+            
+         case "Quit Client":
+            System.exit(1);
+            break;
+            
+         case "About":
+            doAbout();
+            break;
       }
    }
    
@@ -304,7 +312,19 @@ public class Client extends JFrame implements ActionListener{
    */
    public void doQuit(){
       doOutIn("QUIT");
-   }  
+   } 
+   
+   public void doAbout(){
+      ImageIcon icon = new ImageIcon(Client.class.getResource("/rit.png"));
+   
+      JOptionPane.showMessageDialog(
+         null,
+         "<html><h1>RIT Students</h1></html> \n Authors:\n    Tyler S Arnett\n    Dishant Mishra\n    Clare Truell\n    Cambell Schweickhardt\n    Shuming Li",
+         "About", JOptionPane.PLAIN_MESSAGE,
+         icon
+         );
+   
+   } 
    
    
    /*
