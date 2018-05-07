@@ -15,152 +15,183 @@ import javax.crypto.spec.SecretKeySpec;
 import java.security.MessageDigest;
 
 public class Client extends JFrame implements ActionListener{
-
-   //Simple fields for sending message
-   private JLabel jlFrom = new JLabel("From:");
-   private JLabel jlTo = new JLabel("To:");
-   private JLabel jlIP = new JLabel("IP:");
-   private JLabel jlSubject = new JLabel("Subject:");
-   private JLabel jlMessage = new JLabel("Message:");
-   private JLabel jlUser = new JLabel("Username:");
-   private JLabel jlPass = new JLabel("Password:");
-
-   private JTextField jtfFrom = new JTextField(14);
-   private JTextField jtfTo = new JTextField(14);
-   private JTextField jtfIP = new JTextField(14);
-   private JTextField jtfSubject = new JTextField(14);
-   private JTextArea jtaMessage = new JTextArea(20,40);
-
-   private JButton jbConnect = new JButton("Connect");
-
-   //simple fields for ining message
-   private JLabel jlFromR = new JLabel("From:");
-   private JLabel jlToR = new JLabel("To:");
-   private JLabel jlSubjectR = new JLabel("Subject:");
-   private JLabel jlMessageR = new JLabel("Message content:");
-
-   private JTextField jtfFromR = new JTextField(14);
-   private JTextField jtfToR = new JTextField(14);
-   private JTextField jtfSubjectR = new JTextField(14);
-   private JTextArea jtaMessageR = new JTextArea(20,40);
-   private JTextField jtfUsername = new JTextField(10);
-   private JTextField jtfPassword = new JTextField(10);
-
-   private JButton jbSend = new JButton("Send");
-   private JButton jbFetch = new JButton("Fetch");
    
-   //java.net
+   private static final int PORT_NUMBER = 42069;
+
    private Socket socket = null;
-   private int PORT_NUMBER = 42069;
    private PrintWriter out = null;
    private Scanner in = null;
    private EncryptDecrypt ed = new EncryptDecrypt();
+   
+   private JFrame login = new JFrame();
 
-   public static void main(String args[]){
+   private JPanel jpNorthContainer = new JPanel();
+   private JPanel jpNorthTop = new JPanel();
+   private JPanel jpNorthBot = new JPanel();
+   private JPanel jpEast = new JPanel();
+   private JPanel jpSouth = new JPanel();
+   private JPanel jpWest = new JPanel();
+   private JPanel jpCenter = new JPanel();
+   
+      //menu bar   
+   private JMenuBar jmb = new JMenuBar();
+         //help menu
+   private JMenu jmHelp = new JMenu("Help?");
+   private JMenuItem jmiAbout = new JMenuItem("About");
+         //email menu
+   private JMenu jmEmail = new JMenu("Email Client Controls");
+   private JMenuItem jmiConnect = new JMenuItem("Connect to Server");
+   private JMenuItem jmiDisconnect = new JMenuItem("Disconnect from Server");
+   private JMenuItem jmiLine1 = new JMenuItem("------------------------------");
+   private JMenuItem jmiSend = new JMenuItem("Send Email");
+   private JMenuItem jmiFetch = new JMenuItem("Fetch Emails");
+   private JMenuItem jmiLine2 = new JMenuItem("------------------------------");
+   private JMenuItem jmiQuit = new JMenuItem("Quit Client");
+      //end menu bar
+   
+      //to and subj
+   private JLabel jlRcpt = new JLabel("Rcpt: ");
+   private JLabel jlSubj = new JLabel("Subj: ");
+   private JTextField jtfRcpt = new JTextField(20);
+   private JTextField jtfSubj = new JTextField(20);
+      //end to and subj
+   
+      //body and log
+   private JTextArea jtaEmail = new JTextArea(35,35);
+   private JScrollPane jspEmail = new JScrollPane(jtaEmail);
+   private JTextArea jtaLog = new JTextArea(35,15);
+   private JScrollPane jspLog = new JScrollPane(jtaLog);
+      //end body and log
+   
+      //login popup
+   private JPanel jpLogin = new JPanel();
+   private JPanel jpLoginSouth = new JPanel();
+   private JLabel jlServerIP = new JLabel("Server Address: ");
+   private JLabel jlUsername = new JLabel("Username: ");
+   private JLabel jlPassword = new JLabel("Password: ");
+   private JTextField jtfServerIP = new JTextField(15);
+   private JTextField jtfUsername = new JTextField(15);
+   private JTextField jtfPassword = new JTextField(15);
+   private JButton jbLogin = new JButton("Login");
+      //end login popup
+   
+   public static void main(String[] args) {
       new Client();
    }
-   public Client(){
-      JPanel jpTop = new JPanel();
-      jpTop.setLayout(new GridLayout(5,2));
+   private Client(){
+      //Font font = new FontHandler().setFont1();
    
-         //Send side
-      JPanel jpServer = new JPanel();
-      jpServer.setLayout(new FlowLayout(FlowLayout.LEFT));
-      jpServer.add(jlIP);
-      jpServer.add(jtfIP);
-      jpServer.add(jbConnect);
+      this.setLocationRelativeTo(null);
+      this.setTitle("Client Placeholder");
+      this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+      this.setSize(700,700);
+      
+      this.setJMenuBar(jmb);
+      jmb.add(jmEmail);
+      jmEmail.add(jmiConnect);
+      jmEmail.add(jmiDisconnect);
+      jmEmail.add(jmiLine1);
+      jmiLine1.setEnabled(false);
+      jmEmail.add(jmiSend);
+      jmEmail.add(jmiFetch);
+      jmEmail.add(jmiLine2);
+      jmiLine2.setEnabled(false);
+      jmEmail.add(jmiQuit);
+      jmb.add(jmHelp);
+      jmHelp.add(jmiAbout);
+      
+      this.add(jpCenter,BorderLayout.CENTER);
+      jpCenter.add(jspEmail, BorderLayout.WEST);
+      jpCenter.add(jspLog, BorderLayout.EAST);
+      
+      this.add(jpNorthContainer,BorderLayout.NORTH);
+      jpNorthContainer.setLayout(new GridLayout(2,1));
+      jpNorthContainer.add(jpNorthTop);
+      jpNorthContainer.add(jpNorthBot);
+      jpNorthTop.setLayout(new FlowLayout(FlowLayout.LEFT));
+      jpNorthBot.setLayout(new FlowLayout(FlowLayout.LEFT));
+      jpNorthTop.add(jlRcpt);
+      jpNorthTop.add(jtfRcpt);
+      jpNorthBot.add(jlSubj);
+      jpNorthBot.add(jtfSubj);
+
+      login(this);
+
+      this.pack();
+      this.setVisible(true);
+      
+      jmiConnect.addActionListener(this);
+      jmiSend.addActionListener(this);
+      jmiFetch.addActionListener(this);
+      jbLogin.addActionListener(this);
+      jmiAbout.addActionListener(this);
+      jmiQuit.addActionListener(this);
+      jmiDisconnect.addActionListener(this);
+      
+   } 
    
-      JPanel jpTo = new JPanel();
-      jpTo.setLayout(new FlowLayout(FlowLayout.LEFT));
-      jpTo.add(jlTo);
-      jpTo.add(jtfTo);
-   
-      JPanel jpFrom = new JPanel();
-      jpFrom.setLayout(new FlowLayout(FlowLayout.LEFT));
-      jpFrom.add(jlFrom);
-      jpFrom.add(jtfFrom);
-   
-      JPanel jpSubject = new JPanel();
-      jpSubject.setLayout(new FlowLayout(FlowLayout.LEFT));
-      jpSubject.add(jlSubject);
-      jpSubject.add(jtfSubject);
-   
-         //view side
-      JPanel jpFromR = new JPanel();
-      jpFromR.setLayout(new FlowLayout(FlowLayout.LEFT));
-      jpFromR.add(jlFromR);
-      jpFromR.add(jtfFromR);
-   
-      JPanel jpToR = new JPanel();
-      jpToR.setLayout(new FlowLayout(FlowLayout.LEFT));
-      jpToR.add(jlToR);
-      jpToR.add(jtfToR);
-   
-      JPanel jpSubjectR = new JPanel();
-      jpSubjectR.setLayout(new FlowLayout(FlowLayout.LEFT));
-      jpSubjectR.add(jlSubjectR);
-      jpSubjectR.add(jtfSubjectR);
-   
-      //5 rows by 2 columns
-      jpTop.add(jpServer);  jpTop.add(new JPanel());
-      jpTop.add(jpTo);      //jpTop.add(jpToR);
-      jpTop.add(jpFrom);    //jpTop.add(jpFromR);
-      jpTop.add(jpSubject); //jpTop.add(jpSubjectR);
-   
-      JPanel jpCenter = new JPanel();
-      jpCenter.setLayout(new GridLayout(1,2));
-      jpCenter.add(jtaMessage);
-      jpCenter.add(jtaMessageR);
-   
-      JPanel jpSouth = new JPanel();
-      jpSouth.setLayout(new FlowLayout(FlowLayout.LEFT));
-      jpSouth.add(jlUser);
-      jpSouth.add(jtfUsername);
-      jpSouth.add(jlPass);
-      jpSouth.add(jtfPassword);
-      jpSouth.add(jbSend);
-      jpSouth.add(jbFetch);
-   
-      this.add(jpSouth,BorderLayout.SOUTH);
-      this.add(jpCenter, BorderLayout.CENTER);
-      this.add(jpTop, BorderLayout.NORTH);
-   
-      jbConnect.addActionListener(this);
-      jbSend.addActionListener(this);
-      jbFetch.addActionListener(this);
-   
-      setTitle("Client");
-      setVisible(true);
-      setSize(800,600);
-      setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-      setLocation(0,0);
+   private void login(JFrame jf){
+      
+      login.setLocationRelativeTo(null);
+      login.setTitle("Login");
+      login.setDefaultCloseOperation(EXIT_ON_CLOSE);
+      login.setSize(100,100);
+      
+      login.add(jpLogin,BorderLayout.CENTER);
+      login.add(jpLoginSouth,BorderLayout.SOUTH);
+      
+      jpLogin.setLayout(new GridLayout(3,2));
+      
+      jpLogin.add(jlServerIP);
+      jpLogin.add(jtfServerIP);
+      jpLogin.add(jlUsername);
+      jpLogin.add(jtfUsername);
+      jpLogin.add(jlPassword);
+      jpLogin.add(jtfPassword);
+      jpLoginSouth.add(jbLogin);
+      
+      login.pack();
+      login.setVisible(false);
    }
    
    public void actionPerformed(ActionEvent ae){
    
       switch(ae.getActionCommand()){
-         case "Connect":
+         case "Connect to Server":
             doConnect();
             break;
+         
+         case "Login":
+            doLogin();
+            break;
+            
+         case"Disconnect from Server":
+            doQuit();
+            break;
       
-         case "Send":
+         case "Send Email":
             doSend();
             break;
       
-         case "Fetch":
+         case "Fetch Emails":
             doFetch();
             break;
       }
    }
    
    public void doConnect(){
+      login.setVisible(true);
+   }
+   
+   public void doLogin(){
       try{
-         socket = new Socket(jtfIP.getText(),PORT_NUMBER);
+         socket = new Socket(jtfServerIP.getText(),PORT_NUMBER);
          out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
          in = new Scanner(new InputStreamReader(socket.getInputStream()));
          doOutIn(jtfUsername.getText());
          doOutIn(jtfPassword.getText());
          doOutIn("HELO relay.group_three.org");         
+         login.setVisible(false);
          
       }catch(ConnectException ce){
          System.out.println("Could not connect to the server, is it on?");
@@ -172,7 +203,7 @@ public class Client extends JFrame implements ActionListener{
    }
    
    public void doSend(){
-      Message msg = new Message(jtfTo.getText(),jtfFrom.getText(),jtfSubject.getText(),jtaMessage.getText(),jtfIP.getText());
+      Message msg = new Message(jtfRcpt.getText(),jtfUsername.getText(),jtfSubj.getText(),jtaEmail.getText(),jtfServerIP.getText());
       if(msg.isValid()){
          msg.parseMessage();
          try{
@@ -217,9 +248,9 @@ public class Client extends JFrame implements ActionListener{
             for(int j = 0; j<fileLines; j++){
                String message = doInString();
                System.out.println(message);
-               byte[] ggwp = ed.hexStringToByteArray(message);
-               String finalMessage = ed.decryptText(ggwp, ed.getSecretEncryptionKey());
-               bw.write(finalMessage);
+               //byte[] ggwp = ed.hexStringToByteArray(message);
+               //String finalMessage = ed.decryptText(ggwp, ed.getSecretEncryptionKey());
+               bw.write(message);
                bw.newLine();
                bw.flush();
             }
@@ -233,7 +264,7 @@ public class Client extends JFrame implements ActionListener{
    }
    
    public void doIn(){
-      jtaMessageR.append(in.nextLine() + "\n");
+      jtaLog.append(in.nextLine() + "\n");
    }
    public void doOut(String message){
       out.println(message);

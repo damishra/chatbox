@@ -11,6 +11,8 @@ class Message {
    private String message = "null1";
    private String ip = "null1";
    private LocalDateTime ldt = LocalDateTime.now();
+   
+   private EncryptDecrypt ed = new EncryptDecrypt();
 
    ArrayList<String> cc = new ArrayList<String>();
 
@@ -38,17 +40,19 @@ class Message {
       return to;
    }
     
-   String getMessage(){
+   String getMessage() throws Exception{
+	   byte[] ba = ed.encryptText(message, ed.getSecretEncryptionKey());
+	   message = ed.bytesToHex(ba);
       return message;
    }
 
-   ArrayList<String> formatMessage() {
+   ArrayList<String> formatMessage() throws Exception {
       ArrayList<String> formatMessage = new ArrayList<>();
       formatMessage.add(from);
       formatMessage.add(to);
       formatMessage.add(""+ldt);
       formatMessage.add(subject);
-      formatMessage.add(message);
+      formatMessage.add(getMessage());
       formatMessage.add(".");
       return formatMessage;
    }
