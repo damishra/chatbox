@@ -347,9 +347,11 @@ public class Client extends JFrame implements ActionListener{
          System.out.println(numberOfFiles+"");
          for(int i = 0; i<numberOfFiles; i++){
             fileLines = Integer.parseInt(doInString());
+            File fileSave = new File("inbox/"+fileName);
+            fileSave.getParentFile().mkdirs();
             System.out.println(fileLines+"");
             fileName = doInString();
-            bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("inbox/"+fileName)));
+            bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileSave)));
             for(int j = 0; j<fileLines; j++){
                String message = doInString();
                System.out.println(message);
